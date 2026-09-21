@@ -6,6 +6,11 @@ export const metadata: Metadata = {
   title: "开元六爻 · 六爻起卦与排盘",
   description:
     "六爻起卦 · 自动装卦 · 规则分析 · AI 解读。可复核的六爻计算引擎与现代起卦体验。",
+  icons: {
+    icon: "/favicon.ico",           // 放在 public/ 目录下
+    shortcut: "/favicon.ico",
+    apple: "/apple-icon.png",       // iOS 图标（可选）
+  },
 };
 
 export default function RootLayout({
