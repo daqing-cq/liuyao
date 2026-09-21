@@ -1,0 +1,23 @@
+services:
+  kaiyuan-liuyao:
+    build: .
+    container_name: kaiyuan-liuyao
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      NODE_ENV: production
+      TZ: Asia/Shanghai
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      SESSION_SECRET: ${SESSION_SECRET}
+      AI_CONFIG_PATH: /app/data/config/ai.json
+      # 可选：环境变量覆盖 ai.json 中的 apiKey（§54-9）
+      # AI_API_KEY: ${AI_API_KEY}
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

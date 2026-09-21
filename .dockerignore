@@ -1,0 +1,24 @@
+# 构建上下文只保留源码与清单文件，避免把本地 node_modules（含指向
+# packages/ 的 junction 符号链接）和构建产物发给 Docker 守护进程
+node_modules
+**/node_modules
+.next
+**/dist
+**/*.tsbuildinfo
+.git
+.github
+data
+.env
+.env.example
+.env.local
+*.log
+server.log
+cookies.txt
+tests
+scripts/test-*.mjs
+# 注意：docker-entrypoint.sh 由 Dockerfile 从上下文 COPY，不能排除
+Dockerfile
+docker-compose.yml
+README.md
+RULES-CONFLICTS.md
+LICENSE

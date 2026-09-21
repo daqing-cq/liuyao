@@ -1,0 +1,12 @@
+node_modules/
+.next/
+out/
+dist/
+*.log
+.env
+.env.local
+cookies.txt
+server.log
+data/
+packages/liuyao-engine/tsconfig.tsbuildinfo
+*.tsbuildinfo

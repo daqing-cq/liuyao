@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #ffffff;
+  --fg: #1a1a1a;
+  --muted: #6b6b6b;
+  --border: #e5e5e5;
+  --accent: #8c6a4a;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Noto Sans SC",
+    sans-serif;
+}
+
+.line-yang {
+  position: relative;
+  height: 14px;
+  background: var(--fg);
+  border-radius: 2px;
+}
+
+.line-yin {
+  position: relative;
+  height: 14px;
+  border-radius: 2px;
+}
+
+.line-yin::before,
+.line-yin::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  height: 14px;
+  width: 38%;
+  background: var(--fg);
+  border-radius: 2px;
+}
+
+.line-yin::before {
+  left: 0;
+}
+
+.line-yin::after {
+  right: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

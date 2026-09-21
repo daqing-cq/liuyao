@@ -1,0 +1,40 @@
+{
+  "name": "kaiyuan-liuyao",
+  "version": "1.2.0",
+  "private": true,
+  "description": "开元六爻 —— 现代极简白色 UI 的文王六爻 / 京房纳甲在线起卦与排盘网站",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ],
+  "overrides": {
+    "postcss": "^8.5.28"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit -p packages/liuyao-engine && tsc --noEmit",
+    "test": "npm run test --workspaces --if-present",
+    "test:engine": "npm run test --workspace liuyao-engine",
+    "audit:high": "npm audit --audit-level=high"
+  },
+  "dependencies": {
+    "next": "15.5.25",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "server-only": "^0.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.17.24",
+    "@types/react": "18.3.20",
+    "@types/react-dom": "18.3.5",
+    "autoprefixer": "^10.6.1",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^15.5.25",
+    "postcss": "^8.5.28",
+    "tailwindcss": "^3.4.19",
+    "typescript": "5.5.4"
+  }
+}

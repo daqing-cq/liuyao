@@ -1,0 +1,23 @@
+{
+  "name": "liuyao-engine",
+  "version": "1.2.0",
+  "description": "开元六爻纯 TypeScript 计算引擎（不依赖 React / Next.js / DOM / 浏览器 API）",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test --experimental-strip-types tests/basic.test.ts tests/time.test.ts tests/rules.test.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  }
+}
