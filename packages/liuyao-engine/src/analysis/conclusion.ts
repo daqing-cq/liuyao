@@ -94,6 +94,7 @@ type RuleRow = {
   ruleId: string;
   title: string;
   statement: string;
+  outcome: RuleOutcome;
   when: (ctx: ConclusionContext) => boolean;
 };
 
@@ -112,18 +113,21 @@ const RULE_TABLE: RuleRow[] = [
     ruleId: "CONC_NOT_ON_CHART",
     title: "用神不上卦",
     statement: "用神不上卦，需高级伏神规则或手动判断（伏神功能未开启），基础结论难断。",
+    outcome: "难断",
     when: (c) => c.useGod.position === null,
   },
   {
     ruleId: "CONC_VOID_OR_BROKEN",
     title: "用神旬空/月破且无解救",
     statement: "用神旬空或月破且无解救，不自动强断，输出难断。",
+    outcome: "难断",
     when: (c) => c.useGod.isVoid || c.useGod.isMonthBroken,
   },
   {
     ruleId: "CONC_SELF_STRONG",
     title: "占自身世爻旺相",
     statement: "占自身吉凶且用神为世，世爻旺相，吉；世衰则凶。",
+    outcome: "吉",
     when: (c) =>
       c.useGod.category === "自己吉凶" &&
       c.useGod.relative === (c.chart.lines.find((l) => l.shiYing === "世")?.relative ?? "") &&
@@ -133,6 +137,7 @@ const RULE_TABLE: RuleRow[] = [
     ruleId: "CONC_SELF_WEAK",
     title: "占自身世爻衰弱",
     statement: "占自身吉凶且用神为世，世爻衰弱，凶。",
+    outcome: "凶",
     when: (c) =>
       c.useGod.category === "自己吉凶" &&
       c.useGod.relative === (c.chart.lines.find((l) => l.shiYing === "世")?.relative ?? "") &&
@@ -142,6 +147,7 @@ const RULE_TABLE: RuleRow[] = [
     ruleId: "CONC_WORLD_RETURN_SHENG",
     title: "世爻动化回头生",
     statement: "世爻发动，动化回头生，世爻得变爻生助，吉。",
+    outcome: "吉",
     when: (c) => {
       const shi = c.chart.lines.find((l) => l.shiYing === "世");
       return !!shi && !!shi.isMoving && shi.returnEffect === "回头生";
@@ -151,6 +157,7 @@ const RULE_TABLE: RuleRow[] = [
     ruleId: "CONC_WORLD_RETURN_KE",
     title: "世爻动化回头克",
     statement: "世爻发动，动化回头克，世爻受变爻克制，凶。",
+    outcome: "凶",
     when: (c) => {
       const shi = c.chart.lines.find((l) => l.shiYing === "世");
       return !!shi && !!shi.isMoving && shi.returnEffect === "回头克";
@@ -160,6 +167,7 @@ const RULE_TABLE: RuleRow[] = [
     ruleId: "CONC_STRONG_YUAN_SHENG",
     title: "用神旺相 + 原神发动生用",
     statement: "用神旺相，原神（或用神自身）发动生助，无忌神动克用，事可成，吉。",
+    outcome: "吉",
     when: (c) => {
       if (!strongStates.includes(c.useGod.monthStrength)) return false;
       const jiKe = c.movingLines.some((m) => m.actionToUseGod === "克用神" && m.element === c.useGod.jiShen.element);
@@ -171,6 +179,7 @@ const RULE_TABLE: RuleRow[] = [
     ruleId: "CONC_STRONG_JI_KE_YUAN_ZHI",
     title: "用神旺相 + 忌神动克 + 原神制忌",
     statement: "用神旺相，忌神发动克用，但原神能动制忌或生用，过程有阻，吉。",
+    outcome: "吉",
     when: (c) => {
       if (!strongStates.includes(c.useGod.monthStrength)) return false;
       const jiKe = c.movingLines.some((m) => m.actionToUseGod === "克用神" && m.element === c.useGod.jiShen.element);
@@ -184,6 +193,7 @@ const RULE_TABLE: RuleRow[] = [
     ruleId: "CONC_WEAK_JI_KE",
     title: "用神衰弱 + 忌神发动克用",
     statement: "用神衰弱，忌神发动克用，事难成，凶。",
+    outcome: "凶",
     when: (c) => {
       if (!weakStates.includes(c.useGod.monthStrength)) return false;
       return c.movingLines.some((m) => m.actionToUseGod === "克用神" && m.element === c.useGod.jiShen.element);
@@ -191,26 +201,77 @@ const RULE_TABLE: RuleRow[] = [
   },
   {
     ruleId: "CONC_WEAK_YUAN_SHENG",
-    title: "用神衰弱 + 原神发动生用",
-    statement: "用神衰弱，原神发动生用，无忌神动克，费力可成，吉。",
+    title: "用神衰弱 + 动爻生扶用神",
+    statement: "用神衰弱，动爻生用或扶用，无忌神动克，费力可成，吉。",
+    outcome: "吉",
     when: (c) => {
       if (!weakStates.includes(c.useGod.monthStrength)) return false;
-      const jiKe = c.movingLines.some((m) => m.actionToUseGod === "克用神" && m.element === c.useGod.jiShen.element);
-      const yuanSheng = c.movingLines.some((m) => m.actionToUseGod === "生用神" && m.element === c.useGod.yuanShen.element);
-      return yuanSheng && !jiKe;
+      const jiKe = c.movingLines.some((m) => m.actionToUseGod === "克用神");
+      const benefit = c.movingLines.some((m) => m.actionToUseGod === "生用神" || m.actionToUseGod === "扶用神");
+      return benefit && !jiKe;
     },
+  },
+  {
+    ruleId: "CONC_STRONG_MOVING_BENEFICIAL",
+    title: "用神旺相 + 动爻生扶用神",
+    statement: "用神旺相，动爻生用或扶用，无忌神动克，事可成，吉。",
+    outcome: "吉",
+    when: (c) => {
+      if (!strongStates.includes(c.useGod.monthStrength)) return false;
+      const jiKe = c.movingLines.some((m) => m.actionToUseGod === "克用神" && m.element === c.useGod.jiShen.element);
+      const beneficial = c.movingLines.some((m) => m.actionToUseGod === "生用神" || m.actionToUseGod === "扶用神");
+      return beneficial && !jiKe;
+    },
+  },
+  {
+    ruleId: "CONC_STRONG_MOVING_KE",
+    title: "用神旺相 + 动爻克用神",
+    statement: "用神旺相，虽动爻克用，然用神气旺可抗，事有阻而可成，吉。",
+    outcome: "吉",
+    when: (c) => {
+      if (!strongStates.includes(c.useGod.monthStrength)) return false;
+      return c.movingLines.some((m) => m.actionToUseGod === "克用神");
+    },
+  },
+  {
+    ruleId: "CONC_STRONG_MOVING_NEUTRAL",
+    title: "用神旺相 + 动爻无直接关系",
+    statement: "用神旺相，动爻与用神无直接生克，按用神自身旺相论，吉/平。",
+    outcome: "吉/平",
+    when: (c) =>
+      strongStates.includes(c.useGod.monthStrength) &&
+      c.movingLines.length > 0 &&
+      !c.movingLines.some((m) =>
+        m.actionToUseGod === "生用神" || m.actionToUseGod === "扶用神" || m.actionToUseGod === "克用神"
+      ),
   },
   {
     ruleId: "CONC_STRONG_NO_MOVING",
     title: "用神旺相 + 无动爻",
     statement: "用神旺相而卦中无动爻，吉/平，按用神状态定。",
+    outcome: "吉/平",
     when: (c) =>
       strongStates.includes(c.useGod.monthStrength) && c.movingLines.length === 0,
+  },
+  {
+    ruleId: "CONC_WEAK_MOVING_NEUTRAL",
+    title: "用神衰弱 + 动爻无直接关系",
+    statement: "用神衰弱，动爻与用神无直接生克亦无生助，事难成，凶。",
+    outcome: "凶",
+    when: (c) => {
+      if (!weakStates.includes(c.useGod.monthStrength)) return false;
+      if (c.movingLines.length === 0) return false;
+      const hasBenefit = c.movingLines.some((m) => m.actionToUseGod === "生用神" || m.actionToUseGod === "扶用神");
+      const hasKe = c.movingLines.some((m) => m.actionToUseGod === "克用神" && m.element === c.useGod.jiShen.element);
+      // 无生助亦无原神制忌；凡有克用或中性动爻而用神衰弱，按衰断凶
+      return !hasBenefit || hasKe;
+    },
   },
   {
     ruleId: "CONC_WEAK_NO_MOVING",
     title: "用神衰弱 + 无动爻",
     statement: "用神衰弱且无动爻，保守显示难断。",
+    outcome: "难断",
     when: (c) =>
       weakStates.includes(c.useGod.monthStrength) && c.movingLines.length === 0,
   },
@@ -330,17 +391,7 @@ export function conclude(
         sourceType: "handbook",
       });
       return {
-        conclusion: rule.statement.includes("难断")
-          ? "难断"
-          : rule.ruleId === "CONC_SELF_STRONG" || rule.ruleId === "CONC_WORLD_RETURN_SHENG" || rule.ruleId === "CONC_STRONG_YUAN_SHENG" || rule.ruleId === "CONC_STRONG_JI_KE_YUAN_ZHI" || rule.ruleId === "CONC_WEAK_YUAN_SHENG"
-            ? "吉"
-            : rule.ruleId === "CONC_SELF_WEAK" || rule.ruleId === "CONC_WORLD_RETURN_KE" || rule.ruleId === "CONC_WEAK_JI_KE"
-              ? "凶"
-              : rule.ruleId === "CONC_STRONG_NO_MOVING"
-                ? "吉/平"
-                : rule.ruleId === "CONC_WEAK_NO_MOVING"
-                  ? "难断"
-                  : "难断",
+        conclusion: rule.outcome,
         ruleId: rule.ruleId,
         ruleTitle: rule.title,
         statement: rule.statement,
