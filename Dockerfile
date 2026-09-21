@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ---------- deps ----------
-FROM node:24-bookworm-slim AS deps
+FROM node:lts-bookworm-slim AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY packages/liuyao-engine/package.json packages/liuyao-engine/package.json
@@ -10,7 +10,7 @@ RUN npm ci --ignore-scripts
 # ---------- engine ----------
 # liuyao-engine 的 dist/ 不入库（.gitignore），镜像内从 src 现场构建；
 # 纯 TS、零运行时依赖，next build 解析 node_modules/liuyao-engine 时需要它
-FROM node:24-bookworm-slim AS engine
+FROM node:lts-bookworm-slim AS engine
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY packages/liuyao-engine/package.json packages/liuyao-engine/tsconfig.json packages/liuyao-engine/
@@ -18,7 +18,7 @@ COPY packages/liuyao-engine/src packages/liuyao-engine/src
 RUN npx tsc -p packages/liuyao-engine/tsconfig.json
 
 # ---------- builder ----------
-FROM node:24-bookworm-slim AS builder
+FROM node:lts-bookworm-slim AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
@@ -27,7 +27,7 @@ COPY . .
 RUN npm run build
 
 # ---------- runner ----------
-FROM node:24-bookworm-slim AS runner
+FROM node:lts-bookworm-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \

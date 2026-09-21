@@ -14,7 +14,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          # lts/* 自动解析为当前最新 LTS（引擎测试需 node >=22.6）
+          node-version: lts/*
           cache: npm
 
       - name: Install dependencies
