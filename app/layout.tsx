@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.ico",           // 放在 public/ 目录下
     shortcut: "/favicon.ico",
-    apple: "/apple-icon.png",       // iOS 图标（可选）
+    apple: "/apple-icon.png",       // iOS 图标（可选是否放置）
   },
 };
 
