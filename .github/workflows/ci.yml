@@ -23,6 +23,11 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      # 应用层 typecheck 通过 npm workspace 引用 liuyao-engine 的 dist/ 产物，
+      # 而 dist/ 不入库（.gitignore），须先构建引擎（与 Dockerfile 的 engine 阶段一致）
+      - name: Build engine (dist for typecheck)
+        run: npm run build --workspace liuyao-engine
+
       - name: Typecheck
         run: npm run typecheck
 
