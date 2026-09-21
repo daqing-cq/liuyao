@@ -7,6 +7,9 @@ dist/
 .env.local
 cookies.txt
 server.log
-data/
+/data/
 packages/liuyao-engine/tsconfig.tsbuildinfo
 *.tsbuildinfo
+# 运营音频（管理员按需放置 mp3），保留目录占位
+public/audio/*.mp3
+public/audio/*.wav
