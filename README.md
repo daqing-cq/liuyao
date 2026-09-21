@@ -1,6 +1,6 @@
 # 开元六爻
 
-部署详细教程：<a href="https://www.ta-ku.top/blog/liuyao-kytb" target="_blank" rel="noopener noreferrer">开元六爻</a >
+部署详细教程：https://www.ta-ku.top/blog/liuyao-kytb 
 
 > 六爻起卦 · 自动装卦 · 规则分析 · AI 解读
 
